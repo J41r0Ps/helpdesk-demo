@@ -12,13 +12,14 @@ jobs:
       # prisma generate needs a URL in the config, but does not connect to it
       DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
       - run: npm ci
       - run: npx prisma generate
+      - run: npx next typegen
       - run: npm run lint
       - run: npx tsc --noEmit
       - run: npm test
