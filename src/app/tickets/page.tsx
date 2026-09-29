@@ -1,10 +1,22 @@
+import { getCurrentUser } from "@/lib/current-user";
+import { ticketScopeFor } from "@/lib/access";
+import { prisma } from "@/lib/db";
+
 export default async function TicketsPage() {
-  const nu = new Date().toLocaleTimeString("nl-BE");
-  console.log("🟢 Deze log verschijnt op de SERVER om", nu);
+  const user = await getCurrentUser();
+  if (!user) {
+    return <p className="text-gray-600">Choose a user in the top right to see tickets.</p>;
+  }
+
+  const count = await prisma.ticket.count({ where: ticketScopeFor(user) });
+
   return (
-    <main className="p-8">
+    <div>
       <h1 className="text-2xl font-bold">Tickets</h1>
-      <p>Pagina gemaakt op de server om {nu}</p>
-    </main>
+      <p className="text-gray-600">
+        Logged in as {user.name} ({user.role.toLowerCase()}, {user.organization.name}): you can see{" "}
+        <strong>{count}</strong> tickets.
+      </p>
+    </div>
   );
 }
